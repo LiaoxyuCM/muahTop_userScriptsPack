@@ -1,38 +1,39 @@
 // ==UserScript==
 // @name         Muah.top Plus
 // @namespace    http://tampermonkey.net/
-// @version      26.18.4
+// @version      26.18.5
 // @description  try to take over the world!
 // @author       LiaoxyuCM
 // @match        https://muah.top/
 // @icon         https://q.qlogo.cn/g?b=qq&amp;nk=3905086322&amp;s=640
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function() {
     'use strict';
     let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    function updateSvgStroke() {
-        isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const svgs = document.querySelectorAll(".icons svg");
-        svgs.forEach((svg) => {
-            svg.style.stroke = isDarkMode ? '#0ff' : '#00f';
-        });
+
+    GM_addStyle(`
+    #main {
+        -ms-overflow-style: none;  /* IE 和 Edge */
+        scrollbar-width: none;     /* Firefox */
     }
-
-
-
-    // 初始调用
-    updateSvgStroke();
-
-    document.querySelector("#wrap").style.marginBottom = "0";
-    document.querySelector("#wrap").style.paddingBottom = "0";
-
-    // 监听主题变化
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    darkModeQuery.addEventListener('change', (e) => {
-        updateSvgStroke();
-    });
+    #main::-webkit-scrollbar {
+        display: none;
+    }
+    #wrap {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .icons svg {
+        stroke: #00f;
+    }
+    @media(prefers-color-scheme: dark) {
+        .icons svg {
+            stroke: #0ff
+        }
+    }
+    `);
 
     const title = document.querySelector("#top h1");
     title.textContent = "";
