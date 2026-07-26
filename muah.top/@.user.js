@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Muah.top Plus
 // @namespace    http://tampermonkey.net/
-// @version      26.24.0
+// @version      26.30.0
 // @description  try to take over the world!
 // @author       LiaoxyuCM
 // @match        https://muah.top/
@@ -16,7 +16,7 @@
 
     GM_addStyle(`
     :root {
-        --secondary-text:#0f172a;--toast-bg:#fff6;--toast-bg-highlighted:#0009;--toast-info-bg:#3b82f666;--toast-success-bg:#22c55e66;--toast-warn-bg:#f59e0b66;--toast-error-bg:#ef444466;--toast-debug-bg:#6b728066;--toast-info-highlighted:#3b82f6;--toast-success-highlighted:#22c55e;--toast-warn-highlighted:#f59e0b;--toast-error-highlighted:#ef4444;--toast-debug-highlighted:#6b7280
+        --secondary-text:#0f172a;--toast-success-bg:#22c55e66;--toast-error-bg:#ef444466;--toast-success-highlighted:#22c55e;--toast-error-highlighted:#ef4444;
     }
 
     #main {
@@ -33,18 +33,36 @@
     .icons svg {
         stroke: #00f;
     }
-    @media(prefers-color-scheme: dark) {
-        :root {
-            --secondary-text:#e2e8f0;--toast-bg:#0006;--toast-bg-highlighted:#fff9;--toast-info-bg:#3b82f666;--toast-success-bg:#22c55e66;--toast-warn-bg:#f59e0b66;--toast-error-bg:#ef444466;--toast-debug-bg:#4b556366;--toast-info-highlighted:#60a5fa;--toast-success-highlighted:#4ade80;--toast-warn-highlighted:#fbbf24;--toast-error-highlighted:#f87171;--toast-debug-highlighted:#9ca3af
-        }
-        .icons svg {
-            stroke: #0ff
-        }
+
+    .header-right a {
+        position: relative;
+    }
+
+    .header-right a::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #1a73e8;
+        transition: .3s width ease-out;
+    }
+
+    .header-right a:hover::before {
+        width: 100%;
     }
 
     .toast-notification{background-color:var(--toast-bg);color:var(--secondary-text);z-index:9990;white-space:normal;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);cursor:pointer;opacity:1;border-radius:8px;padding:15px 20px;font-size:14px;line-height:20px;transition:top .3s,opacity .3s;position:fixed;right:20px;overflow:hidden;box-shadow:0 4px 12px #00000026}.toast-notification.error{background-color:var(--toast-error-bg)}.toast-notification.error:before{background-color:var(--toast-error-highlighted)}.toast-notification.warn{background-color:var(--toast-warn-bg)}.toast-notification.warn:before{background-color:var(--toast-warn-highlighted)}.toast-notification.success{background-color:var(--toast-success-bg)}.toast-notification.success:before{background-color:var(--toast-success-highlighted)}.toast-notification.info{background-color:var(--toast-info-bg)}.toast-notification.info:before{background-color:var(--toast-info-highlighted)}.toast-notification.debug{background-color:var(--toast-debug-bg)}.toast-notification.debug:before{background-color:var(--toast-debug-highlighted)}.toast-notification.toast-enter{animation:.3s forwards toastSlideInRight}.toast-notification.toast-exit{animation:.3s forwards toastFadeOutUp}.toast-notification.toast-exit:before{width:100%}.toast-notification:before{content:"";background-color:var(--toast-bg-highlighted);border-radius:0 0 8px 8px;width:0%;height:3px;position:absolute;bottom:0;left:0}.toast-notification:not(.toast-enter):not(.toast-exit):before{animation:toastHighlight var(--toast-duration,1.7s) ease-in-out forwards}@keyframes toastHighlight{0%{width:0%}to{width:100%}}@keyframes toastSlideInRight{0%{opacity:0;transform:translate(calc(100% + 20px))}to{opacity:1;transform:translate(0)}}@keyframes toastFadeOutUp{0%{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
 
-    @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+        :root {
+            --secondary-text:#e2e8f0;--toast-success-bg:#22c55e66;--toast-error-bg:#ef444466;--toast-success-highlighted:#4ade80;--toast-error-highlighted:#f87171;
+        }
+        .icons svg {
+            stroke: #0ff
+        }
+
         body {
             background: #0a0c10;
         }
@@ -62,12 +80,16 @@
             color: #8ab4f8;
         }
 
+        .header-right a::before {
+            background-color: #8ab4f8;
+        }
+
         .card {
             background: #1e1f22;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        .card-header {
+        .card-header, .card li {
             border-bottom-color: #2c2d30;
         }
 
@@ -78,10 +100,6 @@
         .card-arrow {
             color: #9aa0a6;
             transition: transform 0.3s ease;
-        }
-
-        .card li {
-            border-bottom-color: #2c2d30;
         }
 
         .card a {
@@ -153,6 +171,23 @@
     }
     `);
 
+    function setFavicon(url) {
+        // 获取现有的 favicon link 标签
+        let link = document.querySelector("link[rel*='icon']");
+
+        // 如果不存在则创建
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'favicon icon';
+            document.head.appendChild(link);
+        }
+
+        link.href = url;
+    }
+
+
+    setFavicon("https://p.qlogo.cn/gh/975967340/975967340/");
+
 
     const title = document.querySelector(".header .header-left a");
     title.textContent = "";
@@ -183,9 +218,9 @@
         }
     };
     function showToast (
-        content,
-        type = "success",
-        duration = 2000,
+     content,
+     type = "success",
+     duration = 2000,
     ) {
         const toastElement = document.createElement('div');
         toastElement.className = 'toast-notification';
@@ -247,8 +282,6 @@
         error: (text) => showToast(text, "error"),
     }
 
-
-
     function typing(elem, text, delay, index) {
         if (text.split('')[index]) {
             setTimeout(() => {
@@ -261,6 +294,24 @@
 
     let hcl = 212;
     function addHoverEffect() {
+        const searchbar = document.querySelector(".search-input");
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key == "/" && searchbar) {
+                if (!(searchbar.matches(":focus"))) {
+                    e.preventDefault();
+                    searchbar.focus();
+                }
+            }
+        });
+        searchbar.addEventListener("keydown", (e) => {
+            if (e.key == "Escape" && searchbar) {
+                if (searchbar.matches(":focus")) {
+                    e.preventDefault();
+                    searchbar.blur();
+                }
+            }
+        });
         const main = document.querySelector("#list .list-cards");
         if (document.querySelector(".关于本插件")) return;
         if (main) {
@@ -285,7 +336,7 @@
             let currHue = hcl;
             card.querySelector("a").style.color = `lch(70% 76% ${currHue})`;
 
-            card.style.borderLeft = "2px solid " + (isDarkMode ? "#1e1f22" : "#fff");
+            card.style.borderLeft = "2px solid #0000";
             card.style.transition = ".15s all ease-out";
             card.addEventListener("mouseenter", () => {
                 card.style.borderLeft = `2px solid lch(80% 76% ${currHue})`;
@@ -295,7 +346,7 @@
                 card.querySelector("a").appendChild(newElem)
             });
             card.addEventListener("mouseleave", () => {
-                card.style.borderLeft = "2px solid " + (isDarkMode ? "#1e1f22" : "#fff");
+                card.style.borderLeft = "2px solid #0000";
                 card.querySelector("a").removeChild(card.querySelector("a").lastChild)
             });
             hcl = (hcl + 15) % 361;
@@ -303,7 +354,6 @@
 
     }
 
-    // 监听动态添加的内容
     const observer = new MutationObserver(() => addHoverEffect());
     observer.observe(document.body, { childList: true, subtree: true });
 
@@ -318,8 +368,4 @@
     );
     typing(title, "ChenQingMua", 50, 0);
 
-
-
 })();
-
-
