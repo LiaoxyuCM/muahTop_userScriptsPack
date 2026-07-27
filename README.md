@@ -8,5 +8,4 @@
 
 ## 依赖
 
-篡改猴\(Tampermonkey\)
-&gt;v5.4.1最佳
+确保使用了支持`GM_addStyle`接口的脚本管理器, 推荐使用[Tampermonkey](https://www.tampermonkey.net/) (篡改猴)

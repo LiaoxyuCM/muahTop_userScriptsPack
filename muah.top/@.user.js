@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Muah.top Plus
 // @namespace    http://tampermonkey.net/
-// @version      26.30.0
+// @version      26.31.0
 // @description  try to take over the world!
 // @author       LiaoxyuCM
 // @match        https://muah.top/
@@ -30,6 +30,16 @@
         margin-bottom: 0;
         padding-bottom: 0;
     }
+
+    #list .list-cards .card-body ul li {
+        border-left: 2px solid #0000;
+        transition: .15s all ease-out;
+    }
+
+    #list .list-cards .card-body ul li:hover {
+        border-left: 2px solid lch(80% 76% var(--currHue));
+    }
+
     .icons svg {
         stroke: #00f;
     }
@@ -60,7 +70,7 @@
             --secondary-text:#e2e8f0;--toast-success-bg:#22c55e66;--toast-error-bg:#ef444466;--toast-success-highlighted:#4ade80;--toast-error-highlighted:#f87171;
         }
         .icons svg {
-            stroke: #0ff
+            stroke: #0ff;
         }
 
         body {
@@ -293,6 +303,7 @@
     //    document.querySelector("#nav").style.backgroundColor = "none";
 
     let hcl = 212;
+    let hitokotolock = false;
     function addHoverEffect() {
         const searchbar = document.querySelector(".search-input");
 
@@ -304,6 +315,7 @@
                 }
             }
         });
+
         searchbar.addEventListener("keydown", (e) => {
             if (e.key == "Escape" && searchbar) {
                 if (searchbar.matches(":focus")) {
@@ -336,18 +348,23 @@
             let currHue = hcl;
             card.querySelector("a").style.color = `lch(70% 76% ${currHue})`;
 
-            card.style.borderLeft = "2px solid #0000";
-            card.style.transition = ".15s all ease-out";
+            card.style.setProperty("--currHue", currHue);
+
+            card.style.borderLeft = "";
             card.addEventListener("mouseenter", () => {
-                card.style.borderLeft = `2px solid lch(80% 76% ${currHue})`;
-                let newElem = document.createElement("small")
-                newElem.textContent = " - "+card.querySelector("a").getAttribute("href");
-                newElem.style.color = "#6d6d6d";
-                card.querySelector("a").appendChild(newElem)
+                // card.style.borderLeft = `2px solid lch(80% 76% ${currHue})`;
+                if (card.querySelector("small")) {
+                    card.querySelector("small").style.display = ""
+                } else {
+                    let newElem = document.createElement("small")
+                    newElem.textContent = " - "+card.querySelector("a").getAttribute("href");
+                    newElem.style.color = "#6d6d6d";
+                    card.querySelector("a").appendChild(newElem)
+                }
             });
             card.addEventListener("mouseleave", () => {
-                card.style.borderLeft = "2px solid #0000";
-                card.querySelector("a").removeChild(card.querySelector("a").lastChild)
+                // card.style.borderLeft = "";
+                card.querySelector("a").lastChild.style.display = "none";
             });
             hcl = (hcl + 15) % 361;
         });
