@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Muah.top Plus
 // @namespace    http://tampermonkey.net/
-// @version      26.31.0
+// @version      26.31.1
 // @description  try to take over the world!
 // @author       LiaoxyuCM
 // @match        https://muah.top/
@@ -17,6 +17,30 @@
     GM_addStyle(`
     :root {
         --secondary-text:#0f172a;--toast-success-bg:#22c55e66;--toast-error-bg:#ef444466;--toast-success-highlighted:#22c55e;--toast-error-highlighted:#ef4444;
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #fff2;
+        backdrop-filter: blur(5px);
+        transition: .3s all ease-out;
+        justify-content: none;
+        display: flex;
+    }
+
+    .header .header-left {
+        flex: 1;
+    }
+
+    .header .progressBar {
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: 0;
+        height: 2px;
+        background-color: #1a73e8;
     }
 
     #main {
@@ -38,6 +62,11 @@
 
     #list .list-cards .card-body ul li:hover {
         border-left: 2px solid lch(80% 76% var(--currHue));
+    }
+
+
+    #list .list-cards .card-body ul li a small {
+        transition: .1s opacity ease-in-out;
     }
 
     .icons svg {
@@ -78,7 +107,7 @@
         }
 
         .header {
-            background: #1e1f22;
+            background: #1e1f2220;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
@@ -91,6 +120,10 @@
         }
 
         .header-right a::before {
+            background-color: #8ab4f8;
+        }
+
+        .header.progressBar {
             background-color: #8ab4f8;
         }
 
@@ -198,6 +231,15 @@
 
     setFavicon("https://p.qlogo.cn/gh/975967340/975967340/");
 
+    const gfv = document.createElement("div");
+    gfv.className = "progressBar";
+
+    window.addEventListener("scroll", () => {
+        gfv.style.width = `${window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100}%`;
+    });
+
+    document.querySelector(".header").appendChild(gfv);
+
 
     const title = document.querySelector(".header .header-left a");
     title.textContent = "";
@@ -303,7 +345,6 @@
     //    document.querySelector("#nav").style.backgroundColor = "none";
 
     let hcl = 212;
-    let hitokotolock = false;
     function addHoverEffect() {
         const searchbar = document.querySelector(".search-input");
 
@@ -354,17 +395,17 @@
             card.addEventListener("mouseenter", () => {
                 // card.style.borderLeft = `2px solid lch(80% 76% ${currHue})`;
                 if (card.querySelector("small")) {
-                    card.querySelector("small").style.display = ""
+                    card.querySelector("small").style.opacity = "1";
                 } else {
-                    let newElem = document.createElement("small")
+                    let newElem = document.createElement("small");
                     newElem.textContent = " - "+card.querySelector("a").getAttribute("href");
                     newElem.style.color = "#6d6d6d";
-                    card.querySelector("a").appendChild(newElem)
+                    card.querySelector("a").appendChild(newElem);
                 }
             });
             card.addEventListener("mouseleave", () => {
                 // card.style.borderLeft = "";
-                card.querySelector("a").lastChild.style.display = "none";
+                card.querySelector("small").style.opacity = "0";
             });
             hcl = (hcl + 15) % 361;
         });
